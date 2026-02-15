@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="BPMN Sketcher for ChatGPT">
+  <bpmn:process id="Process_LiteratureReview" isExecutable="true">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Researcher" name="Researcher">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_IdentifyResearchFocus</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ExtractKeywords</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_FormulateSearchQuery</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_OpenGoogleScholar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ExecuteSearch</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ApplyDateFilter</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_VerifyResultCount</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ScanFirstPage</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_MorePapersToProcess</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_IsPaperRelevant</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_CheckAccessType</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_OpenPaperPage</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_AccessUCLogin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_DownloadPDF</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SavePDF</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_1</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_1" name="Start Literature Review">
+      <bpmn:outgoing>Flow_StartToIdentify</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_IdentifyResearchFocus" name="Identify Research Focus">
+      <bpmn:incoming>Flow_StartToIdentify</bpmn:incoming>
+      <bpmn:outgoing>Flow_IdentifyToExtract</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_ExtractKeywords" name="Extract Primary Keywords">
+      <bpmn:incoming>Flow_IdentifyToExtract</bpmn:incoming>
+      <bpmn:outgoing>Flow_ExtractToFormulate</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_FormulateSearchQuery" name="Formulate Search Query String">
+      <bpmn:incoming>Flow_ExtractToFormulate</bpmn:incoming>
+      <bpmn:incoming>Flow_ResultTooNarrowBroad</bpmn:incoming>
+      <bpmn:outgoing>Flow_FormulateToOpenGS</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_OpenGoogleScholar" name="Open Google Scholar">
+      <bpmn:incoming>Flow_FormulateToOpenGS</bpmn:incoming>
+      <bpmn:outgoing>Flow_OpenGSToExecute</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_ExecuteSearch" name="Type Query &amp; Execute Search">
+      <bpmn:incoming>Flow_OpenGSToExecute</bpmn:incoming>
+      <bpmn:outgoing>Flow_ExecuteToFilter</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_ApplyDateFilter" name="Apply Date Filter &#39;Since 2020&#39;">
+      <bpmn:incoming>Flow_ExecuteToFilter</bpmn:incoming>
+      <bpmn:outgoing>Flow_FilterToGatewayResult</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_VerifyResultCount" name="Result Count?">
+      <bpmn:incoming>Flow_FilterToGatewayResult</bpmn:incoming>
+      <bpmn:outgoing>Flow_ResultTooNarrowBroad</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ResultAcceptable</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_ScanFirstPage" name="Scan First Page for Relevant Papers">
+      <bpmn:incoming>Flow_ResultAcceptable</bpmn:incoming>
+      <bpmn:incoming>Flow_MorePapersYes</bpmn:incoming>
+      <bpmn:outgoing>Flow_ScanToMorePapersGateway</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_MorePapersToProcess" name="More Papers to Process?">
+      <bpmn:incoming>Flow_ScanToMorePapersGateway</bpmn:incoming>
+      <bpmn:incoming>Flow_PaperNotRelevant</bpmn:incoming>
+      <bpmn:incoming>Flow_NotAvailable</bpmn:incoming>
+      <bpmn:incoming>Flow_SaveToMorePapers</bpmn:incoming>
+      <bpmn:outgoing>Flow_MorePapersYes</bpmn:outgoing>
+      <bpmn:outgoing>Flow_MorePapersNo</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_IsPaperRelevant" name="Is Current Paper Relevant?">
+      <bpmn:incoming>Flow_MorePapersYes</bpmn:incoming>
+      <bpmn:outgoing>Flow_PaperRelevant</bpmn:outgoing>
+      <bpmn:outgoing>Flow_PaperNotRelevant</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_CheckAccessType" name="Check Access Type?">
+      <bpmn:incoming>Flow_PaperRelevant</bpmn:incoming>
+      <bpmn:outgoing>Flow_OpenAccess</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Paywall</bpmn:outgoing>
+      <bpmn:outgoing>Flow_NotAvailable</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_OpenPaperPage" name="Open Paper Page (Open Access)">
+      <bpmn:incoming>Flow_OpenAccess</bpmn:incoming>
+      <bpmn:outgoing>Flow_OpenPageToDownload</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_AccessUCLogin" name="Access UC Institutional Login">
+      <bpmn:incoming>Flow_Paywall</bpmn:incoming>
+      <bpmn:outgoing>Flow_LoginToDownload</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_DownloadPDF" name="Download PDF File">
+      <bpmn:incoming>Flow_OpenPageToDownload</bpmn:incoming>
+      <bpmn:incoming>Flow_LoginToDownload</bpmn:incoming>
+      <bpmn:outgoing>Flow_DownloadToSave</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_SavePDF" name="Save PDF with Naming Convention">
+      <bpmn:incoming>Flow_DownloadToSave</bpmn:incoming>
+      <bpmn:outgoing>Flow_SaveToMorePapers</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="EndEvent_1" name="End Literature Review">
+      <bpmn:incoming>Flow_MorePapersNo</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_StartToIdentify" sourceRef="StartEvent_1" targetRef="Task_IdentifyResearchFocus" />
+    <bpmn:sequenceFlow id="Flow_IdentifyToExtract" sourceRef="Task_IdentifyResearchFocus" targetRef="Task_ExtractKeywords" />
+    <bpmn:sequenceFlow id="Flow_ExtractToFormulate" sourceRef="Task_ExtractKeywords" targetRef="Task_FormulateSearchQuery" />
+    <bpmn:sequenceFlow id="Flow_FormulateToOpenGS" sourceRef="Task_FormulateSearchQuery" targetRef="Task_OpenGoogleScholar" />
+    <bpmn:sequenceFlow id="Flow_OpenGSToExecute" sourceRef="Task_OpenGoogleScholar" targetRef="Task_ExecuteSearch" />
+    <bpmn:sequenceFlow id="Flow_ExecuteToFilter" sourceRef="Task_ExecuteSearch" targetRef="Task_ApplyDateFilter" />
+    <bpmn:sequenceFlow id="Flow_FilterToGatewayResult" sourceRef="Task_ApplyDateFilter" targetRef="Gateway_VerifyResultCount" />
+    <bpmn:sequenceFlow id="Flow_ResultTooNarrowBroad" name="&lt;100 or &gt;5000" sourceRef="Gateway_VerifyResultCount" targetRef="Task_FormulateSearchQuery" />
+    <bpmn:sequenceFlow id="Flow_ResultAcceptable" name="100-5000" sourceRef="Gateway_VerifyResultCount" targetRef="Task_ScanFirstPage" />
+    <bpmn:sequenceFlow id="Flow_ScanToMorePapersGateway" sourceRef="Task_ScanFirstPage" targetRef="Gateway_MorePapersToProcess" />
+    <bpmn:sequenceFlow id="Flow_MorePapersYes" name="Yes, pick next paper" sourceRef="Gateway_MorePapersToProcess" targetRef="Gateway_IsPaperRelevant" />
+    <bpmn:sequenceFlow id="Flow_MorePapersNo" name="No more papers" sourceRef="Gateway_MorePapersToProcess" targetRef="EndEvent_1" />
+    <bpmn:sequenceFlow id="Flow_PaperRelevant" name="Relevant" sourceRef="Gateway_IsPaperRelevant" targetRef="Gateway_CheckAccessType" />
+    <bpmn:sequenceFlow id="Flow_PaperNotRelevant" name="Skip current paper" sourceRef="Gateway_IsPaperRelevant" targetRef="Gateway_MorePapersToProcess" />
+    <bpmn:sequenceFlow id="Flow_OpenAccess" name="Open Access" sourceRef="Gateway_CheckAccessType" targetRef="Task_OpenPaperPage" />
+    <bpmn:sequenceFlow id="Flow_Paywall" name="Paywall" sourceRef="Gateway_CheckAccessType" targetRef="Task_AccessUCLogin" />
+    <bpmn:sequenceFlow id="Flow_NotAvailable" name="Not Available" sourceRef="Gateway_CheckAccessType" targetRef="Gateway_MorePapersToProcess" />
+    <bpmn:sequenceFlow id="Flow_OpenPageToDownload" sourceRef="Task_OpenPaperPage" targetRef="Task_DownloadPDF" />
+    <bpmn:sequenceFlow id="Flow_LoginToDownload" sourceRef="Task_AccessUCLogin" targetRef="Task_DownloadPDF" />
+    <bpmn:sequenceFlow id="Flow_DownloadToSave" sourceRef="Task_DownloadPDF" targetRef="Task_SavePDF" />
+    <bpmn:sequenceFlow id="Flow_SaveToMorePapers" sourceRef="Task_SavePDF" targetRef="Gateway_MorePapersToProcess" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_LiteratureReview">
+      <bpmndi:BPMNShape id="Lane_Researcher_di" bpmnElement="Lane_Researcher">
+        <dc:Bounds x="160" y="80" width="1000" height="600" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="202" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="190" y="145" width="61" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1p50j3k_di" bpmnElement="Task_IdentifyResearchFocus">
+        <dc:Bounds x="290" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1w9b49s_di" bpmnElement="Task_ExtractKeywords">
+        <dc:Bounds x="420" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0q0qg9v_di" bpmnElement="Task_FormulateSearchQuery">
+        <dc:Bounds x="550" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1n85y8k_di" bpmnElement="Task_OpenGoogleScholar">
+        <dc:Bounds x="680" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0p720g0_di" bpmnElement="Task_ExecuteSearch">
+        <dc:Bounds x="810" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_18e950a_di" bpmnElement="Task_ApplyDateFilter">
+        <dc:Bounds x="940" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1211y49_di" bpmnElement="Gateway_VerifyResultCount" isMarkerVisible="true">
+        <dc:Bounds x="965" y="205" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="955" y="262" width="69" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1d0p34s_di" bpmnElement="Task_ScanFirstPage">
+        <dc:Bounds x="940" y="320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0k6a655_di" bpmnElement="Gateway_MorePapersToProcess" isMarkerVisible="true">
+        <dc:Bounds x="965" y="445" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="949" y="502" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0n7p8f5_di" bpmnElement="Gateway_IsPaperRelevant" isMarkerVisible="true">
+        <dc:Bounds x="845" y="445" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="826" y="502" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_09c3j5z_di" bpmnElement="Gateway_CheckAccessType" isMarkerVisible="true">
+        <dc:Bounds x="735" y="445" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="715" y="502" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1y7q950_di" bpmnElement="Task_OpenPaperPage">
+        <dc:Bounds x="600" y="423" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_12g00qo_di" bpmnElement="Task_AccessUCLogin">
+        <dc:Bounds x="600" y="540" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_11h1f52_di" bpmnElement="Task_DownloadPDF">
+        <dc:Bounds x="460" y="470" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0k0g207_di" bpmnElement="Task_SavePDF">
+        <dc:Bounds x="320" y="470" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="1092" y="452" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1076" y="495" width="68" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_StartToIdentify_di" bpmnElement="Flow_StartToIdentify">
+        <di:waypoint x="238" y="120" />
+        <di:waypoint x="290" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_IdentifyToExtract_di" bpmnElement="Flow_IdentifyToExtract">
+        <di:waypoint x="390" y="120" />
+        <di:waypoint x="420" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ExtractToFormulate_di" bpmnElement="Flow_ExtractToFormulate">
+        <di:waypoint x="520" y="120" />
+        <di:waypoint x="550" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_FormulateToOpenGS_di" bpmnElement="Flow_FormulateToOpenGS">
+        <di:waypoint x="650" y="120" />
+        <di:waypoint x="680" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_OpenGSToExecute_di" bpmnElement="Flow_OpenGSToExecute">
+        <di:waypoint x="780" y="120" />
+        <di:waypoint x="810" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ExecuteToFilter_di" bpmnElement="Flow_ExecuteToFilter">
+        <di:waypoint x="910" y="120" />
+        <di:waypoint x="940" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_FilterToGatewayResult_di" bpmnElement="Flow_FilterToGatewayResult">
+        <di:waypoint x="990" y="160" />
+        <di:waypoint x="990" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ResultTooNarrowBroad_di" bpmnElement="Flow_ResultTooNarrowBroad">
+        <di:waypoint x="965" y="230" />
+        <di:waypoint x="600" y="230" />
+        <di:waypoint x="600" y="160" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="804" y="212" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ResultAcceptable_di" bpmnElement="Flow_ResultAcceptable">
+        <di:waypoint x="990" y="255" />
+        <di:waypoint x="990" y="320" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="942" y="280" width="53" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ScanToMorePapersGateway_di" bpmnElement="Flow_ScanToMorePapersGateway">
+        <di:waypoint x="990" y="400" />
+        <di:waypoint x="990" y="445" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_MorePapersYes_di" bpmnElement="Flow_MorePapersYes">
+        <di:waypoint x="965" y="470" />
+        <di:waypoint x="895" y="470" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="898" y="442" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_MorePapersNo_di" bpmnElement="Flow_MorePapersNo">
+        <di:waypoint x="1015" y="470" />
+        <di:waypoint x="1092" y="470" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1027" y="442" width="71" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PaperRelevant_di" bpmnElement="Flow_PaperRelevant">
+        <di:waypoint x="845" y="470" />
+        <di:waypoint x="785" y="470" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="802" y="442" width="41" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PaperNotRelevant_di" bpmnElement="Flow_PaperNotRelevant">
+        <di:waypoint x="870" y="495" />
+        <di:waypoint x="870" y="550" />
+        <di:waypoint x="990" y="550" />
+        <di:waypoint x="990" y="495" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="877" y="532" width="85" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_OpenAccess_di" bpmnElement="Flow_OpenAccess">
+        <di:waypoint x="735" y="470" />
+        <di:waypoint x="700" y="470" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="704" y="442" width="67" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Paywall_di" bpmnElement="Flow_Paywall">
+        <di:waypoint x="760" y="495" />
+        <di:waypoint x="760" y="580" />
+        <di:waypoint x="700" y="580" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="764" y="552" width="45" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_NotAvailable_di" bpmnElement="Flow_NotAvailable">
+        <di:waypoint x="760" y="445" />
+        <di:waypoint x="760" y="320" />
+        <di:waypoint x="990" y="320" />
+        <di:waypoint x="990" y="445" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="764" y="380" width="71" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_OpenPageToDownload_di" bpmnElement="Flow_OpenPageToDownload">
+        <di:waypoint x="600" y="470" />
+        <di:waypoint x="560" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_LoginToDownload_di" bpmnElement="Flow_LoginToDownload">
+        <di:waypoint x="600" y="580" />
+        <di:waypoint x="510" y="580" />
+        <di:waypoint x="510" y="550" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DownloadToSave_di" bpmnElement="Flow_DownloadToSave">
+        <di:waypoint x="460" y="510" />
+        <di:waypoint x="420" y="510" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SaveToMorePapers_di" bpmnElement="Flow_SaveToMorePapers">
+        <di:waypoint x="320" y="510" />
+        <di:waypoint x="280" y="510" />
+        <di:waypoint x="280" y="470" />
+        <di:waypoint x="965" y="470" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
