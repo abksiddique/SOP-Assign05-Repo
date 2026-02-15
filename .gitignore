@@ -1,0 +1,26 @@
+notepad .gitignore
+```
+
+**Notepad will open. Copy and paste this into it:**
+```
+# Environment files with secrets
+.env
+.env.local
+*.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.log
+*.swp
+
+# Python cache
+__pycache__/
+*.pyc
