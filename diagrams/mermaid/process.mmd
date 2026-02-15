@@ -1,0 +1,47 @@
+graph TD
+    Start((Start)) --> S1["1: The researcher identifies the research focus from the dissertation chapter outline"]
+    S1 --> S2["2: The researcher extracts 3-5 primary keywords"]
+    S2 --> S3["3: The researcher formulates a search query string"]
+
+    S3 --> S4["4: The researcher opens Google Scholar"]
+    S4 --> S5["5: Researcher types search query and executes search"]
+    S5 --> S6["6: The researcher applies a date filter"]
+    S6 --> S7{"7: The researcher verifies the appropriate result count"}
+
+    S7 -- "IF result count <100: Too narrow" --> S3
+    S7 -- "IF result count >5000: Too broad" --> S3
+    S7 -- "IF result count 100-5000: Acceptable range" --> S8["8: The researcher scans the first page for relevant papers"]
+
+    S8 --> S9{"9: Researcher checks access type using visual indicators"}
+
+    S9 -- "IF [PDF] link is GREEN with no $ symbol: Open Access" --> S10["10: Researcher opens paper page"]
+    S9 -- "IF [PDF] link shows $ symbol OR says 'Get access': Paywall" --> S11["11: Researcher accesses UC institutional login (if paywalled)"]
+    S9 -- "IF no [PDF] link, only [CITATION]: Not available" --> End((End))
+
+    S11 --> S11_login_status{"Institutional Login Successful?"}
+    S11_login_status -- "Yes" --> S12["12: Researcher downloads PDF file"]
+    S11_login_status -- "No / Login Fails" --> Ex1_1["Ex1-1: Researcher clicks 'Institutional Sign In' button on database page"]
+    
+    Ex1_1 --> Ex1_2["Ex1-2: Researcher enters UC credentials (6-character username + 2-digit year)"]
+    Ex1_2 --> Ex1_3["Ex1-3: Researcher clicks 'Login' button"]
+    Ex1_3 --> Ex1_4["Ex1-4: Researcher validates 'Authenticated' message appears"]
+    
+    Ex1_4 --> Ex1_5_decision{"Ex1-5: IF login fails (after validation)"}
+    Ex1_5_decision -- "No / Login Successful" --> S12
+    Ex1_5_decision -- "Yes / Login Still Fails" --> Ex1_5["Ex1-5: Researcher checks VPN connection (must be on UC network or VPN)"]
+
+    Ex1_5 --> Ex1_6_decision{"Ex1-6: IF still fails (after VPN check)"}
+    Ex1_6_decision -- "No / Login Successful" --> S12
+    Ex1_6_decision -- "Yes / Login Still Fails" --> Ex1_6["Ex1-6: Researcher verifies credential format is correct (6+2)"]
+    
+    Ex1_6 --> Ex1_7_decision{"Ex1-7: IF still fails (after credential check)"}
+    Ex1_7_decision -- "No / Login Successful" --> S12
+    Ex1_7_decision -- "Yes / Login Still Fails" --> Ex1_7["Ex1-7: Researcher contacts advisor to arrange library access support"]
+    
+    Ex1_7 --> Ex1_Escalation["Ex1 Escalation: Discuss alternatives with advisor (ILL request, open access versions)"]
+    Ex1_Escalation --> End((End))
+
+    S10 --> S12
+    S12 --> S13["13: Researcher saves PDF with standard naming convention"]
+    S13 --> End((End))
+```
